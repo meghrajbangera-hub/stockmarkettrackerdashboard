@@ -43,6 +43,20 @@ st.markdown("""
 
     /* General text color boost */
     .stMarkdown, .stText { color: #e8eaf2 !important; }
+
+    /* Dropdown / selectbox fix */
+    div[data-baseweb="select"] * { color: #111111 !important; background-color: #ffffff !important; }
+    div[data-baseweb="select"] input { color: #111111 !important; }
+    div[data-baseweb="popover"] * { color: #111111 !important; background-color: #ffffff !important; }
+    ul[data-baseweb="menu"] li { color: #111111 !important; font-size: 14px !important; font-weight: 500 !important; }
+    ul[data-baseweb="menu"] li:hover { background-color: #f0f4ff !important; }
+    div[data-baseweb="select"] div { color: #111111 !important; }
+
+    /* Text input fix */
+    div[data-baseweb="input"] input { color: #111111 !important; background-color: #ffffff !important; }
+
+    /* Sidebar selects stay light on dark */
+    section[data-testid="stSidebar"] div[data-baseweb="select"] * { color: #e8eaf2 !important; background-color: #1c1f2b !important; }
 </style>
 """, unsafe_allow_html=True)
 
