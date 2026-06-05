@@ -217,14 +217,59 @@ tab1, tab2, tab3, tab4 = st.tabs(["📋 Watchlist", "📊 Charts", "⭐ Today's 
 
 # ── TAB 1: WATCHLIST ─────────────────────────────────────
 with tab1:
+
+    st.markdown("#### ⚡ Quick filters")
+    quick_options = [
+        "📋 All stocks",
+        "🚀 Top 20 gainers today",
+        "📉 Top 20 losers today (buy opportunity)",
+        "🟢 Top 20 Buy signals",
+        "⭐ Top 20 by 1-month performance",
+        "🏆 Top 20 by 1-year performance",
+        "🔥 Top 20 by 5-year performance",
+        "💥 Top 20 biggest fall from 52W high",
+    ]
+    quick = st.selectbox("Show me →", quick_options, index=0)
+    st.markdown("---")
+
     search = st.text_input("🔍 Search", placeholder="Company name or ticker...")
+
     display = [r for r in data
                if (not search or search.lower() in r["Name"].lower() or search.lower() in r["Ticker"].lower())
                and (sector_f=="All" or r["Sector"]==sector_f)
                and (list_f=="All" or r["List"]==list_f)
                and (signal_f=="All" or r["Signal"]==signal_f)]
-    display.sort(key=lambda r: r[sort_col], reverse=not sort_asc)
-    st.caption(f"Showing {len(display)} of {len(data)} stocks")
+
+    if quick == "🚀 Top 20 gainers today":
+        display = sorted(display, key=lambda r: r["1D %"], reverse=True)[:20]
+    elif quick == "📉 Top 20 losers today (buy opportunity)":
+        display = sorted(display, key=lambda r: r["1D %"])[:20]
+    elif quick == "🟢 Top 20 Buy signals":
+        buys_only = [r for r in display if "BUY" in r["Signal"]]
+        display = sorted(buys_only, key=lambda r: r["1Y %"], reverse=True)[:20]
+    elif quick == "⭐ Top 20 by 1-month performance":
+        display = sorted(display, key=lambda r: r["1M %"], reverse=True)[:20]
+    elif quick == "🏆 Top 20 by 1-year performance":
+        display = sorted(display, key=lambda r: r["1Y %"], reverse=True)[:20]
+    elif quick == "🔥 Top 20 by 5-year performance":
+        display = sorted(display, key=lambda r: r["5Y %"], reverse=True)[:20]
+    elif quick == "💥 Top 20 biggest fall from 52W high":
+        display = sorted(display, key=lambda r: r["1Y %"])[:20]
+    else:
+        display.sort(key=lambda r: r[sort_col], reverse=not sort_asc)
+
+    label_map = {
+        "🚀 Top 20 gainers today": "🚀 Top 20 stocks gaining the most today",
+        "📉 Top 20 losers today (buy opportunity)": "📉 Top 20 stocks down the most today — possible buy opportunities",
+        "🟢 Top 20 Buy signals": "🟢 Top 20 stocks with strongest Buy signals right now",
+        "⭐ Top 20 by 1-month performance": "⭐ Top 20 best performers this month",
+        "🏆 Top 20 by 1-year performance": "🏆 Top 20 best performers this year",
+        "🔥 Top 20 by 5-year performance": "🔥 Top 20 best long-term compounders (5 years)",
+        "💥 Top 20 biggest fall from 52W high": "💥 Top 20 stocks most beaten down — deep value watch",
+    }
+    if quick != "📋 All stocks":
+        st.markdown(f"**{label_map.get(quick,'')}**")
+    st.caption(f"Showing {len(display)} stocks")
 
     if display:
         rows = ""
